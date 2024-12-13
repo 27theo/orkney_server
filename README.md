@@ -2,6 +2,13 @@
 
 ## Setup
 
+### Dune developer preview
+
+```
+"Dune Developer Preview: build 2024-12-13T09:27:33Z, git revision
+e4e98e11663a09d96605d44fd2d44f7403293d7e"
+```
+
 ### Project creation
 
 ```
