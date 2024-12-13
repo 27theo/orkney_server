@@ -1,0 +1,19 @@
+(version 3.17.0)
+
+(build
+ (progn
+  (when
+   %{pkg-self:dev}
+   (run dune subst))
+  (run rm -rf vendor/csexp)
+  (run rm -rf vendor/pp)
+  (run dune build -p %{pkg-self:name} -j %{jobs} @install)))
+
+(depends dune ocaml base-unix csexp)
+
+(source
+ (fetch
+  (url
+   https://github.com/ocaml/dune/releases/download/3.17.0/dune-3.17.0.tbz)
+  (checksum
+   sha256=2c3aa6c41ed39e3d6c1a292d75f4806bd80310841afc51673aa59ce9c816507c)))

@@ -1,12 +1,14 @@
 (lang package 0.1)
 
-(dependency_hash 99133f158db3a6d424c473358549c957)
+(dependency_hash 5328f5539cbc82345070c37026a4a0e9)
 
 (ocaml ocaml-base-compiler)
 
 (repositories
  (complete true)
  (used
+  ((source
+    https://github.com/ocaml-dune/ocaml-binary-packages.git#3c4c2974eb5c1fef86e44f8ac5e469e432290b27))
   ((source
     https://github.com/ocaml-dune/opam-overlays.git#9bad4501e6dd4feb7b61b48d29812241d1d711f9))
   ((source

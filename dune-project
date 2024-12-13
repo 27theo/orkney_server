@@ -19,7 +19,7 @@
  (name orkney)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml)
+ (depends ocaml dream)
  (tags
   ("add topics" "to describe" your project)))
 
