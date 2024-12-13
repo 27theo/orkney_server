@@ -26,3 +26,16 @@ dune exec server
 
 1. Add dependency to `dune-project`
 2. `dune pkg lock`
+
+## Managing the database
+
+This project uses `dbmate`.
+
+```
+# To create the database from scratch
+dbmate up
+# To create a new migration
+dbmate new <name_of_migration>
+# To migrate and implement changes to schema
+dbmate migrate
+```
