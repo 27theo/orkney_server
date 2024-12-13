@@ -19,7 +19,7 @@
  (name server)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dream)
+ (depends ocaml dream dotenv)
  (tags
   ("add topics" "to describe" your project)))
 
