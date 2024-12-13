@@ -1,0 +1,8 @@
+(version 2)
+
+(build
+ (run pkg-config --print-errors --exists libpcre))
+
+(depends conf-pkg-config)
+
+(depexts libpcre3-dev)

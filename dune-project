@@ -19,7 +19,11 @@
  (name server)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dream dotenv)
+ (depends
+   ocaml
+   dream
+   dotenv
+   caqti-driver-sqlite3)
  (tags
   ("add topics" "to describe" your project)))
 

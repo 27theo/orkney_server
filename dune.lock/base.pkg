@@ -1,0 +1,11 @@
+(version v0.16.3)
+
+(build
+ (run dune build -p %{pkg-self:name} -j %{jobs}))
+
+(depends ocaml sexplib0 dune dune-configurator conf-bash)
+
+(source
+ (fetch
+  (url https://github.com/janestreet/base/archive/refs/tags/v0.16.3.tar.gz)
+  (checksum md5=04572fc23a4651604cfcab83f720cb4c)))

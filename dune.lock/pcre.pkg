@@ -1,0 +1,17 @@
+(version 7.5.0)
+
+(build
+ (progn
+  (when
+   %{pkg-self:dev}
+   (run dune subst))
+  (run dune build -p %{pkg-self:name} -j %{jobs} @install)))
+
+(depends dune ocaml dune-configurator conf-libpcre)
+
+(source
+ (fetch
+  (url
+   https://github.com/mmottl/pcre-ocaml/releases/download/7.5.0/pcre-7.5.0.tbz)
+  (checksum
+   sha256=671142f40b6d86171cbc067253faadf903019161d57488bd0fb6c5456c2cbd1a)))

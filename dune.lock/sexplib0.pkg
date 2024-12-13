@@ -1,4 +1,4 @@
-(version v0.17.0)
+(version v0.16.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -8,5 +8,6 @@
 (source
  (fetch
   (url
-   https://github.com/janestreet/sexplib0/archive/refs/tags/v0.17.0.tar.gz)
-  (checksum md5=abafe8fd1d6302e55a315f4d78960d2a)))
+   https://ocaml.janestreet.com/ocaml-core/v0.16/files/sexplib0-v0.16.0.tar.gz)
+  (checksum
+   sha256=86dba26468194512f789f2fb709063515a9cb4e5c4461c021c239a369590701d)))

@@ -1,4 +1,8 @@
 (executable
  (public_name server)
  (name main)
- (libraries server))
+ (libraries
+   dream
+   caqti-driver-sqlite3
+   dotenv
+   routes))

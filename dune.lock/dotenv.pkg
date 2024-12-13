@@ -1,0 +1,13 @@
+(version 0.0.3)
+
+(build
+ (run dune build -p %{pkg-self:name} -j %{jobs}))
+
+(depends ocaml base stdio uutf pcre dune)
+
+(source
+ (fetch
+  (url
+   https://github.com/thatportugueseguy/ocaml-dotenv/releases/download/v0.0.3/dotenv-v0.0.3.tbz)
+  (checksum
+   sha256=b8b0745746db0b8c6dd6bff9de8b89512c657cc5e0d09f9ba29aa5561a07c517)))
