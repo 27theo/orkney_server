@@ -1,4 +1,4 @@
 (executable
- (public_name orkney)
+ (public_name server)
  (name main)
- (libraries orkney))
+ (libraries server))

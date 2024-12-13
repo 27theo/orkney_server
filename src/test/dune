@@ -1,2 +1,2 @@
 (test
- (name test_orkney))
+ (name test_server))

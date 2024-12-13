@@ -1,6 +1,6 @@
 (lang dune 3.18)
 
-(name orkney)
+(name server)
 
 (generate_opam_files true)
 
@@ -16,7 +16,7 @@
 (documentation https://url/to/documentation)
 
 (package
- (name orkney)
+ (name server)
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends ocaml dream)

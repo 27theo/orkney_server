@@ -1,4 +1,4 @@
-# Orkney
+# Lords of Orkney - Server
 
 ## Setup
 
@@ -16,10 +16,10 @@ e4e98e11663a09d96605d44fd2d44f7403293d7e"
 ### Project creation
 
 ```
-dune init proj orkney
-cd orkney
+dune init proj server
+cd server
 dune pkg lock
-dune exec orkney
+dune exec server
 ```
 
 ### Adding a dependency
