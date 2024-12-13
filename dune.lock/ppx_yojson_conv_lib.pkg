@@ -1,0 +1,13 @@
+(version v0.16.0)
+
+(build
+ (run dune build -p %{pkg-self:name} -j %{jobs}))
+
+(depends ocaml dune yojson)
+
+(source
+ (fetch
+  (url
+   https://ocaml.janestreet.com/ocaml-core/v0.16/files/ppx_yojson_conv_lib-v0.16.0.tar.gz)
+  (checksum
+   sha256=557c43c88d365b4cbb514d809f1eecc54d7b9976b0669bc55b02169e6c86ec7d)))

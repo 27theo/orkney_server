@@ -11,10 +11,13 @@ doc: "https://url/to/documentation"
 bug-reports: "https://github.com/username/reponame/issues"
 depends: [
   "dune" {>= "3.18"}
-  "ocaml"
   "dream"
   "dotenv"
   "caqti-driver-sqlite3"
+  "safepass"
+  "ppx_yojson_conv"
+  "lwt_ppx"
+  "ocaml"
   "odoc" {with-doc}
 ]
 build: [

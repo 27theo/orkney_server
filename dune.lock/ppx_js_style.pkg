@@ -1,0 +1,13 @@
+(version v0.16.0)
+
+(build
+ (run dune build -p %{pkg-self:name} -j %{jobs}))
+
+(depends ocaml base dune octavius ppxlib)
+
+(source
+ (fetch
+  (url
+   https://ocaml.janestreet.com/ocaml-core/v0.16/files/ppx_js_style-v0.16.0.tar.gz)
+  (checksum
+   sha256=a63789aaf1b2301d60d29a67f8bae9ba127d98a4f004ab9567b8f16b3c885de0)))

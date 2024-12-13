@@ -20,10 +20,13 @@
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends
-   ocaml
    dream
    dotenv
-   caqti-driver-sqlite3)
+   caqti-driver-sqlite3
+   safepass
+   ppx_yojson_conv
+   lwt_ppx
+   ocaml)
  (tags
   ("add topics" "to describe" your project)))
 
