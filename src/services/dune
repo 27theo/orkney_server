@@ -1,3 +1,5 @@
 (library
  (name services)
- (libraries dream models))
+ (libraries dream models)
+ (preprocess
+  (pps lwt_ppx)))
