@@ -12,7 +12,12 @@ https://github.com/paurkedal/ocaml-caqti/blob/master/examples/bikereg.ml
 module type CONN = Caqti_lwt.CONNECTION
 
 module User = struct
-  type t = { uuid : string; username : string; email : string; hashed_password : string }
+  type t = {
+    uuid : string;
+    username : string;
+    email : string;
+    hashed_password : string;
+  }
 end
 
 module Q = struct
@@ -21,7 +26,9 @@ module Q = struct
 
   let user =
     let open User in
-    let intro uuid username email hashed_password = { uuid; username; email; hashed_password } in
+    let intro uuid username email hashed_password =
+      { uuid; username; email; hashed_password }
+    in
     product intro
     @@ proj string (fun user -> user.uuid)
     @@ proj string (fun user -> user.username)
