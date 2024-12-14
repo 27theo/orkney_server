@@ -1,17 +1,17 @@
-module Config = struct
-  let database_url () =
-    try Sys.getenv "DATABASE_URL"
-    with _ -> failwith "Please define DATABASE_URL in the environment"
+let get_config key =
+  try Sys.getenv key
+  with _ ->
+    failwith (Printf.sprintf "Please define %s in the environment" key)
 
-  let secret_key () =
-    try Sys.getenv "SECRET_KEY"
-    with _ -> failwith "Please define SECRET_KEY in the environment"
-end
+let routes =
+  [
+    Dream.scope "/" [] Routes.Index.routes;
+    Dream.scope "/auth" [] Routes.Auth.routes;
+  ]
 
 let () =
   let () = Dotenv.export () in
   Dream.run @@ Dream.logger
-  @@ Dream.set_secret (Config.secret_key ())
-  @@ Dream.sql_pool (Config.database_url ())
-  @@ Dream.sql_sessions
-  @@ Dream.router Routes.Router.router
+  @@ Dream.set_secret (get_config "SECRET_KEY")
+  @@ Dream.sql_pool (get_config "DATABASE_URL")
+  @@ Dream.sql_sessions @@ Dream.router routes
