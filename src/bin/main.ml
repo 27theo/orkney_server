@@ -7,11 +7,16 @@ let routes =
   [
     Dream.scope "/" [] Routes.Index.routes;
     Dream.scope "/auth" [] Routes.Auth.routes;
+    Dream.scope "/rooms" Routes.Rooms.middleware Routes.Rooms.routes;
   ]
 
 let () =
   let () = Dotenv.export () in
-  Dream.run @@ Dream.logger
+  Dream.run
+  @@ Dream.logger
   @@ Dream.set_secret (get_config "SECRET_KEY")
   @@ Dream.sql_pool (get_config "DATABASE_URL")
-  @@ Dream.sql_sessions @@ Dream.router routes
+  @@ Dream.sql_sessions
+  @@ Routes.Middleware.allow_cross_origins (get_config "UI_URL")
+  @@ Dream.router routes
+[@@ocamlformat "disable"]

@@ -1,11 +1,4 @@
 (*
-type uuid = Uuid of string
-
-let string_of_uuid (Uuid u) = u
-
-let uuid_of_string_opt (s : string) : uuid option =
-  if String.starts_with ~prefix:"user_" s then Some (Uuid s) else None
-
 https://github.com/paurkedal/ocaml-caqti/blob/master/examples/bikereg.ml
 *)
 
@@ -45,10 +38,18 @@ module Q = struct
     string ->? user @@
     "SELECT * FROM users WHERE username = ?"
   [@@ocamlformat "disable"]
+
+  let select_user_by_uuid =
+    string ->? user @@
+    "SELECT * FROM users WHERE uuid = ?"
+  [@@ocamlformat "disable"]
 end
 
 let create_user ~uuid ~username ~email ~hashed_password (module Conn : CONN) =
-  Conn.find_opt Q.create_user (uuid, username, email, hashed_password)
+  Conn.exec Q.create_user (uuid, username, email, hashed_password)
 
 let select_user_by_username ~username (module Conn : CONN) =
   Conn.find_opt Q.select_user_by_username username
+
+let select_user_by_uuid ~uuid (module Conn : CONN) =
+  Conn.find_opt Q.select_user_by_uuid uuid

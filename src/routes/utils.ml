@@ -17,4 +17,6 @@ let json_receiver json_parser handler request =
     try Ok (body |> Yojson.Safe.from_string |> json_parser) with _ -> Error ()
   with
   | Ok doc -> handler request doc
-  | Error _ -> make_error_response `Bad_Request "Invalid JSON input"
+  | Error _ ->
+      make_error_response `Bad_Request
+        "That JSON input is not valid for this request"
