@@ -44,7 +44,7 @@ type create_room_params = { name : string } [@@deriving yojson]
 
 let create_room =
   let create_room_base request (params : create_room_params) =
-    let uuid = Dream.field request Middleware.field |> Option.get in
+    let uuid = Dream.field request Middleware.auth_field |> Option.get in
     match%lwt
       Services.Room.create_active_room ~request ~name:params.name ~owner:uuid
     with
@@ -59,7 +59,7 @@ let create_room =
 
 let deactivate_room =
   let deactivate_room_base request (params : ruid_param) =
-    let uuid = Dream.field request Middleware.field |> Option.get in
+    let uuid = Dream.field request Middleware.auth_field |> Option.get in
     match%lwt
       Services.Room.deactivate_room ~request ~uuid ~ruid:params.ruid
     with
@@ -72,7 +72,7 @@ let deactivate_room =
 
 let join_room =
   let join_room_base request (params : ruid_param) =
-    let uuid = Dream.field request Middleware.field |> Option.get in
+    let uuid = Dream.field request Middleware.auth_field |> Option.get in
     match%lwt
       Services.Room.add_user_to_room ~request ~uuid ~ruid:params.ruid
     with
