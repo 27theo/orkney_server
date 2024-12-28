@@ -1,6 +1,6 @@
 -- migrate:up
-CREATE TABLE rooms (
-    ruid TEXT PRIMARY KEY,
+CREATE TABLE games (
+    guid TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     is_active BOOLEAN NOT NULL CHECK (is_active IN (0, 1)),
     created_at TEXT NOT NULL,
@@ -10,4 +10,4 @@ CREATE TABLE rooms (
 );
 
 -- migrate:down
-DROP TABLE IF EXISTS rooms;
+DROP TABLE IF EXISTS games;

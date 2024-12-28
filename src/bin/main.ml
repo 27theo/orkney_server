@@ -7,7 +7,7 @@ let routes =
   [
     Dream.scope "/" [] Routes.Index.routes;
     Dream.scope "/auth" [] Routes.Auth.routes;
-    Dream.scope "/rooms" Routes.Rooms.middleware Routes.Rooms.routes;
+    Dream.scope "/games" Routes.Games.middleware Routes.Games.routes;
   ]
 
 let () =
