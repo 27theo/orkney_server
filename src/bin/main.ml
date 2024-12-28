@@ -16,7 +16,6 @@ let () =
   @@ Dream.logger
   @@ Dream.set_secret (get_config "SECRET_KEY")
   @@ Dream.sql_pool (get_config "DATABASE_URL")
-  @@ Dream.sql_sessions
   @@ Routes.Middleware.allow_cross_origins (get_config "UI_URL")
   @@ Dream.router routes
 [@@ocamlformat "disable"]

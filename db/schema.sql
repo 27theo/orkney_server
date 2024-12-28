@@ -5,12 +5,6 @@ CREATE TABLE users (
     email TEXT NOT NULL UNIQUE,
     hashed_password TEXT NOT NULL
 );
-CREATE TABLE dream_session (
-  id TEXT PRIMARY KEY,
-  label TEXT NOT NULL,
-  expires_at REAL NOT NULL,
-  payload TEXT NOT NULL
-);
 CREATE TABLE games (
     guid TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -23,5 +17,4 @@ CREATE TABLE games (
 -- Dbmate schema migrations
 INSERT INTO "schema_migrations" (version) VALUES
   ('20241213142221'),
-  ('20241213153027'),
   ('20241217110752');
