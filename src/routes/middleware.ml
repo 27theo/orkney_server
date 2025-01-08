@@ -24,7 +24,7 @@ let allow_cross_origins url inner_handler request =
     [
       ("Access-Control-Allow-Origin", url);
       ("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-      ("Access-Control-Allow-Headers", "Content-Type");
+      ("Access-Control-Allow-Headers", "Content-Type, X-Api-Key");
     ]
   in
   let () = List.iter (fun (h, v) -> Dream.set_header response h v) headers in
