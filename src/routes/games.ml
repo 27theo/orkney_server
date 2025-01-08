@@ -2,36 +2,13 @@ open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
 type guid_param = { guid : string } [@@deriving yojson]
 
-type game_list_node = {
-  guid : string;
-  name : string;
-  is_active : bool;
-  created_at : string;
-  players : string list;
-  owner : string;
-}
+type game_list = { games : Services.Game.game list }
 [@@deriving yojson]
 
-type game_list_response = { games : game_list_node list } [@@deriving yojson]
-
-let inactive_games request =
-  match%lwt Services.Game.select_all_inactive_games ~request with
-  | Ok rlist ->
-      let rnodes =
-        List.map
-          (fun (g : Models.Game.Game.t) ->
-            let plist = Services.Game.players_list_of_string g.players in
-            {
-              guid = g.guid;
-              name = g.name;
-              is_active = g.is_active;
-              created_at = g.created_at;
-              players = plist;
-              owner = g.owner;
-            })
-          rlist
-      in
-      yojson_of_game_list_response { games = rnodes }
+let relevant_games request =
+  match%lwt Services.Game.select_relevant_games ~request with
+  | Ok glist ->
+      yojson_of_game_list { games = glist }
       |> Yojson.Safe.to_string |> Dream.json
   | Error e ->
       let () =
@@ -84,7 +61,7 @@ let join_game =
 
 let routes =
   [
-    Dream.get "/inactive" inactive_games;
+    Dream.get "/" relevant_games;
     Dream.post "/create" create_game;
     Dream.post "/activate" activate_game;
     Dream.post "/join" join_game;

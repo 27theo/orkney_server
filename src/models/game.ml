@@ -33,13 +33,10 @@ module Q = struct
     t6 string string bool string string string ->. unit @@
     "INSERT INTO games (guid, name, is_active, created_at, players, owner) VALUES (?, ?, ?, ?, ?, ?)"
 
-  let select_all_inactive_games =
+  let select_relevant_games =
+    (* TODO: Implement relevance *)
     unit ->* game @@
-    "SELECT guid, name, is_active, created_at, players, owner FROM games WHERE is_active = 0"
-
-  let select_all_active_games =
-    unit ->* game @@
-    "SELECT guid, name, is_active, created_at, players, owner FROM games WHERE is_active = 1"
+    "SELECT guid, name, is_active, created_at, players, owner FROM games"
 
   let select_game_by_guid =
     string ->! game @@
@@ -63,13 +60,8 @@ let create_game ~guid ~name ~is_active ~created_at ~players ~owner
     (module Conn : CONN) =
   Conn.exec Q.create_game (guid, name, is_active, created_at, players, owner)
 
-let select_all_inactive_games (module Conn : CONN) =
-  let req = Q.select_all_inactive_games in
-  let f game acc = Lwt.return_ok (game :: acc) in
-  Conn.fold_s req f () []
-
-let select_all_active_games (module Conn : CONN) =
-  let req = Q.select_all_active_games in
+let select_relevant_games (module Conn : CONN) =
+  let req = Q.select_relevant_games in
   let f game acc = Lwt.return_ok (game :: acc) in
   Conn.fold_s req f () []
 

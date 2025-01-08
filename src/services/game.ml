@@ -1,5 +1,35 @@
+open Ppx_yojson_conv_lib.Yojson_conv.Primitives
+
 let string_of_players_list l = String.concat "," l
 let players_list_of_string s = String.split_on_char ',' s
+
+type game = {
+  guid : string;
+  name : string;
+  is_active : bool;
+  created_at : string;
+  players : string list;
+  owner : string;
+}
+[@@deriving yojson]
+
+let game_with_usernames_of_game ~request (game : Models.Game.Game.t) =
+  let plist = players_list_of_string game.players in
+  let get_username uuid =
+    let%lwt user = Dream.sql request (Models.User.select_user_by_uuid ~uuid) in
+    Lwt.return @@ match user with Ok (Some u) -> u.username | _ -> "NOTFOUND"
+  in
+  let%lwt player_usernames = Lwt.all @@ List.map get_username plist in
+  let%lwt owner_username = get_username game.owner in
+  Lwt.return
+    {
+      guid = game.guid;
+      name = game.name;
+      is_active = game.is_active;
+      created_at = game.created_at;
+      players = player_usernames;
+      owner = owner_username;
+    }
 
 let create_inactive_game ~request ~name ~owner =
   Dream.sql request
@@ -12,11 +42,14 @@ let create_inactive_game ~request ~name ~owner =
   let players = string_of_players_list [ owner ] in
   Models.Game.create_game ~guid ~name ~is_active ~created_at ~players ~owner
 
-let select_all_active_games ~request =
-  Dream.sql request @@ Models.Game.select_all_active_games
-
-let select_all_inactive_games ~request =
-  Dream.sql request @@ Models.Game.select_all_inactive_games
+let select_relevant_games ~request =
+  match%lwt Dream.sql request Models.Game.select_relevant_games with
+  | Error e -> Lwt.return_error e
+  | Ok glist ->
+      let%lwt glist_with_usernames =
+        Lwt.all @@ List.map (game_with_usernames_of_game ~request) glist
+      in
+      Lwt.return_ok glist_with_usernames
 
 let select_game_by_guid ~request ~guid =
   Dream.sql request @@ Models.Game.select_game_by_guid ~guid

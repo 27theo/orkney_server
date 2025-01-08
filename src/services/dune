@@ -2,4 +2,4 @@
  (name services)
  (libraries dream models)
  (preprocess
-  (pps lwt_ppx)))
+  (pps lwt_ppx ppx_yojson_conv)))
