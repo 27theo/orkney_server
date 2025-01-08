@@ -8,14 +8,14 @@
 
 `./scripts/install-dune.sh` should allow you to install the right dune version.
 
-```
+```txt
 "Dune Developer Preview: build 2024-12-13T09:27:33Z, git revision
 e4e98e11663a09d96605d44fd2d44f7403293d7e"
 ```
 
 ### Project creation
 
-```
+```bash
 dune init proj server
 cd server
 dune pkg lock
@@ -31,7 +31,7 @@ dune exec server
 
 This project uses `dbmate`.
 
-```
+```bash
 # To create the database from scratch
 dbmate up
 # To create a new migration
