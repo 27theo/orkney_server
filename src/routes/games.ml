@@ -1,9 +1,7 @@
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
 type guid_param = { guid : string } [@@deriving yojson]
-
-type game_list = { games : Services.Game.game list }
-[@@deriving yojson]
+type game_list = { games : Services.Game.game list } [@@deriving yojson]
 
 let relevant_games request =
   match%lwt Services.Game.select_relevant_games ~request with
@@ -16,6 +14,23 @@ let relevant_games request =
       in
       Utils.make_error_response `Internal_Server_Error
         "Could not fetch games from the database"
+
+let single_game request =
+  let guid = Dream.param request "guid" in
+  match%lwt Services.Game.select_game_by_guid ~request ~guid with
+  | Ok (Some game) ->
+      let%lwt game = Services.Game.game_with_usernames_of_game ~request game in
+      game |> Services.Game.yojson_of_game |> Yojson.Safe.to_string
+      |> Dream.json
+  | Ok None ->
+      Utils.make_error_response `Not_Found
+        (Printf.sprintf "No such game %s found" guid)
+  | Error e ->
+      let () =
+        Dream.log "Error fetching games from db: %s" (Caqti_error.show e)
+      in
+      Utils.make_error_response `Internal_Server_Error
+        (Printf.sprintf "Could not fetch game %s from the database" guid)
 
 type create_game_params = { name : string } [@@deriving yojson]
 
@@ -62,6 +77,7 @@ let join_game =
 let routes =
   [
     Dream.get "/" relevant_games;
+    Dream.get "/:guid" single_game;
     Dream.post "/create" create_game;
     Dream.post "/activate" activate_game;
     Dream.post "/join" join_game;
