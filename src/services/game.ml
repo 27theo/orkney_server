@@ -32,15 +32,21 @@ let game_with_usernames_of_game ~request (game : Models.Game.Game.t) =
     }
 
 let create_inactive_game ~request ~name ~owner =
-  Dream.sql request
-  @@
-  (* TODO: Change owner to uuid here and throughout lib *)
-  (* TODO: Check if game name is unique against the inactive games *)
-  let guid = Utils.generate_uid "game_" in
-  let is_active = false in
-  let created_at = Unix.time () |> int_of_float |> string_of_int in
-  let players = string_of_players_list [ owner ] in
-  Models.Game.create_game ~guid ~name ~is_active ~created_at ~players ~owner
+  if Int.equal (String.length name) 0 then Lwt.return_error `Bad_Request
+  else
+    (* TODO: Change owner to uuid here and throughout lib *)
+    (* TODO: Check if game name is unique against the inactive games *)
+    let guid = Utils.generate_uid "game_" in
+    let is_active = false in
+    let created_at = Unix.time () |> int_of_float |> string_of_int in
+    let players = string_of_players_list [ owner ] in
+    match%lwt
+      Dream.sql request
+        (Models.Game.create_game ~guid ~name ~is_active ~created_at ~players
+           ~owner)
+    with
+    | Ok () -> Lwt.return_ok ()
+    | Error _ -> Lwt.return_error `Internal_Server_Error
 
 let select_relevant_games ~request =
   match%lwt Dream.sql request Models.Game.select_relevant_games with

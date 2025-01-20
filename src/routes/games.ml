@@ -43,9 +43,7 @@ let create_game =
     | Ok () ->
         Utils.make_message_response `OK
           (Printf.sprintf "Game created: %s" params.name)
-    | Error e ->
-        let () = Dream.log "Error creating game: %s" (Caqti_error.show e) in
-        Utils.make_error_response `Bad_Request "Could not create game"
+    | Error code -> Utils.make_error_response code "Could not create game"
   in
   Utils.json_receiver create_game_params_of_yojson create_game_base
 
