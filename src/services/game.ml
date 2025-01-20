@@ -87,8 +87,7 @@ let remove_user_from_game ~request ~uuid ~guid =
   | Ok (Some r) -> (
       let plist = players_list_of_string r.players in
       if
-        r.is_active
-        || Int.equal (List.length plist) 1
+        r.is_active || String.equal r.owner uuid
         || not (List.exists (String.equal uuid) plist)
       then Lwt.return_error `Bad_Request
       else
