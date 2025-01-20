@@ -1,6 +1,6 @@
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
-type guid_param = { guid : string } [@@deriving yojson]
+type guid_json = { guid : string } [@@deriving yojson]
 type game_list = { games : Services.Game.game list } [@@deriving yojson]
 
 let relevant_games request =
@@ -49,17 +49,12 @@ let create_game =
   in
   Utils.json_receiver create_game_params_of_yojson create_game_base
 
-let activate_game =
-  let activate_game_base request (params : guid_param) =
-    let uuid = Dream.field request Middleware.auth_field |> Option.get in
-    match%lwt Services.Game.activate_game ~request ~uuid ~guid:params.guid with
-    | Ok () ->
-        (* TODO: Return the active game's URL here *)
-        Utils.make_message_response `OK
-          (Printf.sprintf "Game activated: %s" params.guid)
-    | Error code -> Utils.make_error_response code "Could not activate game"
-  in
-  Utils.json_receiver guid_param_of_yojson activate_game_base
+let activate_game request =
+  let guid = Dream.param request "guid" in
+  let uuid = Dream.field request Middleware.auth_field |> Option.get in
+  match%lwt Services.Game.activate_game ~request ~uuid ~guid with
+  | Ok () -> { guid } |> yojson_of_guid_json |> Utils.json_response ~status:`OK
+  | Error code -> Utils.make_error_response code "Could not activate game"
 
 let join_game request =
   let guid = Dream.param request "guid" in
@@ -84,7 +79,7 @@ let routes =
     Dream.get "/" relevant_games;
     Dream.get "/:guid" single_game;
     Dream.post "/create" create_game;
-    Dream.post "/activate" activate_game;
+    Dream.post "/activate/:guid" activate_game;
     Dream.post "/join/:guid" join_game;
     Dream.post "/leave/:guid" leave_game;
   ]
