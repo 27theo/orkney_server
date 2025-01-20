@@ -100,3 +100,14 @@ let remove_user_from_game ~request ~uuid ~guid =
         | Error _ -> Lwt.return_error `Internal_Server_Error)
   | Ok None -> Lwt.return_error `Bad_Request
   | Error _ -> Lwt.return_error `Internal_Server_Error
+
+let delete_game ~request ~uuid ~guid =
+  match%lwt select_game_by_guid ~request ~guid with
+  | Ok (Some r) -> (
+      if not (String.equal r.owner uuid) then Lwt.return_error `Bad_Request
+      else
+        match%lwt Dream.sql request (Models.Game.delete_game ~guid) with
+        | Ok () -> Lwt.return_ok ()
+        | Error _ -> Lwt.return_error `Internal_Server_Error)
+  | Ok None -> Lwt.return_error `Bad_Request
+  | Error _ -> Lwt.return_error `Internal_Server_Error

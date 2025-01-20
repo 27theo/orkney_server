@@ -74,6 +74,14 @@ let leave_game request =
         (Printf.sprintf "User %s left game: %s" uuid guid)
   | Error code -> Utils.make_error_response code "Could not leave game"
 
+let delete_game request =
+  let guid = Dream.param request "guid" in
+  let uuid = Dream.field request Middleware.auth_field |> Option.get in
+  match%lwt Services.Game.delete_game ~request ~uuid ~guid with
+  | Ok () ->
+      Utils.make_message_response `OK (Printf.sprintf "Deleted game: %s" guid)
+  | Error code -> Utils.make_error_response code "Could not delete game"
+
 let routes =
   [
     Dream.get "/" relevant_games;
@@ -82,6 +90,7 @@ let routes =
     Dream.post "/activate/:guid" activate_game;
     Dream.post "/join/:guid" join_game;
     Dream.post "/leave/:guid" leave_game;
+    Dream.post "/delete/:guid" delete_game;
   ]
 
 let middleware = [ Middleware.authenticate_requests ]

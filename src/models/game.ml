@@ -53,6 +53,10 @@ module Q = struct
   let set_game_players =
     t2 string string ->. unit @@
     "UPDATE games SET players = ? WHERE guid = ?"
+
+  let delete_game =
+    string ->. unit @@
+    "DELETE FROM games WHERE guid = ?"
 end
 [@@ocamlformat "disable"]
 
@@ -75,3 +79,5 @@ let deactivate_game ~guid (module Conn : CONN) =
 
 let set_game_players ~guid ~players (module Conn : CONN) =
   Conn.exec Q.set_game_players (players, guid)
+
+let delete_game ~guid (module Conn : CONN) = Conn.exec Q.delete_game guid
