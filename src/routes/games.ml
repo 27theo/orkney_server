@@ -61,18 +61,23 @@ let activate_game =
   in
   Utils.json_receiver guid_param_of_yojson activate_game_base
 
-let join_game =
-  let join_game_base request (params : guid_param) =
-    let uuid = Dream.field request Middleware.auth_field |> Option.get in
-    match%lwt
-      Services.Game.add_user_to_game ~request ~uuid ~guid:params.guid
-    with
-    | Ok () ->
-        Utils.make_message_response `OK
-          (Printf.sprintf "User %s joined game: %s" uuid params.guid)
-    | Error code -> Utils.make_error_response code "Could not join game"
-  in
-  Utils.json_receiver guid_param_of_yojson join_game_base
+let join_game request =
+  let guid = Dream.param request "guid" in
+  let uuid = Dream.field request Middleware.auth_field |> Option.get in
+  match%lwt Services.Game.add_user_to_game ~request ~uuid ~guid with
+  | Ok () ->
+      Utils.make_message_response `OK
+        (Printf.sprintf "User %s joined game: %s" uuid guid)
+  | Error code -> Utils.make_error_response code "Could not join game"
+
+let leave_game request =
+  let guid = Dream.param request "guid" in
+  let uuid = Dream.field request Middleware.auth_field |> Option.get in
+  match%lwt Services.Game.remove_user_from_game ~request ~uuid ~guid with
+  | Ok () ->
+      Utils.make_message_response `OK
+        (Printf.sprintf "User %s left game: %s" uuid guid)
+  | Error code -> Utils.make_error_response code "Could not leave game"
 
 let routes =
   [
@@ -80,7 +85,8 @@ let routes =
     Dream.get "/:guid" single_game;
     Dream.post "/create" create_game;
     Dream.post "/activate" activate_game;
-    Dream.post "/join" join_game;
+    Dream.post "/join/:guid" join_game;
+    Dream.post "/leave/:guid" leave_game;
   ]
 
 let middleware = [ Middleware.authenticate_requests ]

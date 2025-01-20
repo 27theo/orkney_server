@@ -81,3 +81,23 @@ let add_user_to_game ~request ~uuid ~guid =
         | Error _ -> Lwt.return_error `Internal_Server_Error)
   | Ok None -> Lwt.return_error `Bad_Request
   | Error _ -> Lwt.return_error `Internal_Server_Error
+
+let remove_user_from_game ~request ~uuid ~guid =
+  match%lwt select_game_by_guid ~request ~guid with
+  | Ok (Some r) -> (
+      let plist = players_list_of_string r.players in
+      if
+        r.is_active
+        || Int.equal (List.length plist) 1
+        || not (List.exists (String.equal uuid) plist)
+      then Lwt.return_error `Bad_Request
+      else
+        let plist = List.filter (fun u -> not (String.equal uuid u)) plist in
+        let players = string_of_players_list plist in
+        match%lwt
+          Dream.sql request (Models.Game.set_game_players ~guid ~players)
+        with
+        | Ok () -> Lwt.return_ok ()
+        | Error _ -> Lwt.return_error `Internal_Server_Error)
+  | Ok None -> Lwt.return_error `Bad_Request
+  | Error _ -> Lwt.return_error `Internal_Server_Error
