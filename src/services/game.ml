@@ -1,20 +1,31 @@
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
+module State = struct
+  type player_state = { uuid : string; name : string; gold : int }
+  [@@deriving yojson]
+
+  type t = { player_states : player_state list } [@@deriving yojson]
+
+  let parsed_state_of_state state =
+    try state |> Yojson.Safe.from_string |> t_of_yojson
+    with Yojson.Json_error _ -> { player_states = [] }
+end
+
 let string_of_players_list l = String.concat "," l
 let players_list_of_string s = String.split_on_char ',' s
 
-type game = {
+type parsed_game = {
   guid : string;
   name : string;
   is_active : bool;
   created_at : string;
   players : string list;
   owner : string;
-  state : string;
+  state : State.t;
 }
 [@@deriving yojson]
 
-let game_with_usernames_of_game ~request (game : Models.Game.Game.t) =
+let parsed_game_of_game ~request (game : Models.Game.Game.t) =
   let plist = players_list_of_string game.players in
   let get_username uuid =
     let%lwt user = Dream.sql request (Models.User.select_user_by_uuid ~uuid) in
@@ -30,7 +41,7 @@ let game_with_usernames_of_game ~request (game : Models.Game.Game.t) =
       created_at = game.created_at;
       players = player_usernames;
       owner = owner_username;
-      state = game.state;
+      state = State.parsed_state_of_state game.state;
     }
 
 let create_inactive_game ~request ~name ~owner =
@@ -56,7 +67,7 @@ let select_relevant_games ~request =
   | Error e -> Lwt.return_error e
   | Ok glist ->
       let%lwt glist_with_usernames =
-        Lwt.all @@ List.map (game_with_usernames_of_game ~request) glist
+        Lwt.all @@ List.map (parsed_game_of_game ~request) glist
       in
       Lwt.return_ok glist_with_usernames
 
