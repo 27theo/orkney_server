@@ -12,9 +12,11 @@ CREATE TABLE games (
     created_at TEXT NOT NULL,
     players TEXT NOT NULL,
     owner TEXT NOT NULL,
+    state text,
     FOREIGN KEY (owner) REFERENCES users(uuid)
 );
 -- Dbmate schema migrations
 INSERT INTO "schema_migrations" (version) VALUES
   ('20241213142221'),
-  ('20241217110752');
+  ('20241217110752'),
+  ('20250121144721');

@@ -10,6 +10,7 @@ type game = {
   created_at : string;
   players : string list;
   owner : string;
+  state : string;
 }
 [@@deriving yojson]
 
@@ -29,6 +30,7 @@ let game_with_usernames_of_game ~request (game : Models.Game.Game.t) =
       created_at = game.created_at;
       players = player_usernames;
       owner = owner_username;
+      state = game.state;
     }
 
 let create_inactive_game ~request ~name ~owner =
@@ -40,10 +42,11 @@ let create_inactive_game ~request ~name ~owner =
     let is_active = false in
     let created_at = Unix.time () |> int_of_float |> string_of_int in
     let players = string_of_players_list [ owner ] in
+    let state = "" in
     match%lwt
       Dream.sql request
         (Models.Game.create_game ~guid ~name ~is_active ~created_at ~players
-           ~owner)
+           ~owner ~state)
     with
     | Ok () -> Lwt.return_ok ()
     | Error _ -> Lwt.return_error `Internal_Server_Error

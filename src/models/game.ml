@@ -8,6 +8,7 @@ module Game = struct
     created_at : string;
     players : string;
     owner : string;
+    state : string;
   }
 end
 
@@ -17,8 +18,8 @@ module Q = struct
 
   let game =
     let open Game in
-    let intro guid name is_active created_at players owner =
-      { guid; name; is_active; created_at; players; owner }
+    let intro guid name is_active created_at players owner state =
+      { guid; name; is_active; created_at; players; owner; state }
     in
     product intro
     @@ proj string (fun game -> game.guid)
@@ -27,20 +28,21 @@ module Q = struct
     @@ proj string (fun game -> game.created_at)
     @@ proj string (fun game -> game.players)
     @@ proj string (fun game -> game.owner)
+    @@ proj string (fun game -> game.state)
     @@ proj_end
 
   let create_game =
-    t6 string string bool string string string ->. unit @@
-    "INSERT INTO games (guid, name, is_active, created_at, players, owner) VALUES (?, ?, ?, ?, ?, ?)"
+    t7 string string bool string string string string ->. unit @@
+    "INSERT INTO games (guid, name, is_active, created_at, players, owner, state) VALUES (?, ?, ?, ?, ?, ?, ?)"
 
   let select_relevant_games =
     (* TODO: Implement relevance *)
     unit ->* game @@
-    "SELECT guid, name, is_active, created_at, players, owner FROM games"
+    "SELECT guid, name, is_active, created_at, players, owner, state FROM games"
 
   let select_game_by_guid =
     string ->! game @@
-    "SELECT guid, name, is_active, created_at, players, owner FROM games WHERE guid = ?"
+    "SELECT guid, name, is_active, created_at, players, owner, state FROM games WHERE guid = ?"
 
   let activate_game =
     string ->. unit @@
@@ -60,9 +62,10 @@ module Q = struct
 end
 [@@ocamlformat "disable"]
 
-let create_game ~guid ~name ~is_active ~created_at ~players ~owner
+let create_game ~guid ~name ~is_active ~created_at ~players ~owner ~state
     (module Conn : CONN) =
-  Conn.exec Q.create_game (guid, name, is_active, created_at, players, owner)
+  Conn.exec Q.create_game
+    (guid, name, is_active, created_at, players, owner, state)
 
 let select_relevant_games (module Conn : CONN) =
   let req = Q.select_relevant_games in
