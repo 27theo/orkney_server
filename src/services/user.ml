@@ -1,11 +1,17 @@
 (* TODO: Dream.sql should be moved here! *)
 
+let token_of_user request (user : Models.User.User.t) =
+  Dream.to_base64url (Dream.encrypt request ~associated_data:"uuid" user.uuid)
+
 let create_user ~request ~username ~password ~email =
-  Dream.sql request
-  @@
   let uuid = Utils.generate_uid "user_" in
   let hashed_password = Bcrypt.hash password |> Bcrypt.string_of_hash in
-  Models.User.create_user ~uuid ~username ~email ~hashed_password
+  match%lwt
+    Dream.sql request
+      (Models.User.create_user ~uuid ~username ~email ~hashed_password)
+  with
+  | Ok () -> Dream.sql request (Models.User.select_user_by_uuid ~uuid)
+  | Error _ -> Lwt.return_error `Internal_Server_Error
 
 let select_user_by_username ~request ~username =
   Dream.sql request @@ Models.User.select_user_by_username ~username
