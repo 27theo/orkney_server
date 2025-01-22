@@ -1,7 +1,7 @@
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
 type guid_json = { guid : string } [@@deriving yojson]
-type game_list = { games : Services.Game.parsed_game list } [@@deriving yojson]
+type game_list = { games : Services.Game.Game.t list } [@@deriving yojson]
 
 let relevant_games request =
   match%lwt Services.Game.select_relevant_games ~request with
@@ -19,8 +19,8 @@ let single_game request =
   let guid = Dream.param request "guid" in
   match%lwt Services.Game.select_game_by_guid ~request ~guid with
   | Ok (Some game) ->
-      let%lwt game = Services.Game.parsed_game_of_game ~request game in
-      game |> Services.Game.yojson_of_parsed_game |> Yojson.Safe.to_string
+      let%lwt game = Services.Game.parsed_game_of_game request game in
+      game |> Services.Game.Game.yojson_of_t |> Yojson.Safe.to_string
       |> Dream.json
   | Ok None ->
       Utils.make_error_response `Not_Found

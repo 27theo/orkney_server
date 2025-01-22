@@ -45,8 +45,8 @@ module Q = struct
     "SELECT guid, name, is_active, created_at, players, owner, state FROM games WHERE guid = ?"
 
   let activate_game =
-    string ->. unit @@
-    "UPDATE games SET is_active = 1 WHERE guid = ?"
+    t2 string string ->. unit @@
+    "UPDATE games SET is_active = 1, state = ? WHERE guid = ?"
 
   let deactivate_game =
     string ->. unit @@
@@ -75,7 +75,8 @@ let select_relevant_games (module Conn : CONN) =
 let select_game_by_guid ~guid (module Conn : CONN) =
   Conn.find_opt Q.select_game_by_guid guid
 
-let activate_game ~guid (module Conn : CONN) = Conn.exec Q.activate_game guid
+let activate_game ~guid ~state (module Conn : CONN) =
+  Conn.exec Q.activate_game (state, guid)
 
 let deactivate_game ~guid (module Conn : CONN) =
   Conn.exec Q.deactivate_game guid
