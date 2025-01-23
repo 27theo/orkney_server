@@ -83,12 +83,12 @@ let delete_game request =
 let routes =
   [
     Dream.get "/" relevant_games;
-    Dream.get "/:guid" single_game;
     Dream.post "/create" create_game;
     Dream.post "/activate/:guid" activate_game;
     Dream.post "/join/:guid" join_game;
     Dream.post "/leave/:guid" leave_game;
     Dream.post "/delete/:guid" delete_game;
+    Dream.get "/:guid" single_game;
   ]
 
 let middleware = [ Middleware.authenticate_requests ]
