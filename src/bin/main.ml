@@ -6,6 +6,7 @@ let get_config key =
 let routes =
   [
     Dream.scope "/" [] Routes.Index.routes;
+    Dream.scope "/ws" [] Routes.Websockets.routes;
     Dream.scope "/auth" [] Routes.Auth.routes;
     Dream.scope "/games" Routes.Games.middleware Routes.Games.routes;
   ]
