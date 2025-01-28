@@ -1,5 +1,11 @@
 # Lords of Orkney - Server
 
+Server for the Lords of Orkney web implementation. Developed with
+[OCaml](https://ocaml.org), [Dune](https://dune.build),
+[Dream](https://aantron.github.io/dream/).
+
+> See ["Lords of Orkney - Frontend"](https://github.com/27theo/orkney_frontend)
+
 ## Setup
 
 ### Dependencies
