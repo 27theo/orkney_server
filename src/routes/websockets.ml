@@ -11,21 +11,13 @@ let watch_games request =
         let serialized =
           Games.yojson_of_game_list { games = glist } |> Yojson.Safe.to_string
         in
-        let () =
-          if not (String.equal !data serialized) then
-            let _ =
-              if not (String.equal !data "") then
-                Dream.send websocket serialized
-              else Lwt.return_unit
-            in
-            data := serialized
-          else ()
-        in
+        if not (String.equal !data serialized) then (
+          if not (String.equal !data "") then
+            Lwt.ignore_result @@ Dream.send websocket serialized;
+          data := serialized);
         Lwt.return_true
     | Error e ->
-        let () =
-          Dream.log "Error fetching games from db: %s" (Caqti_error.show e)
-        in
+        Dream.log "Error fetching games from db: %s" (Caqti_error.show e);
         Lwt.return_false
   in
   let updater =
@@ -37,7 +29,7 @@ let watch_games request =
     Lwt.bind (Dream.receive websocket) @@ function
     | Some _ -> Lwt.return_true
     | _ ->
-        let _ = Dream.close_websocket websocket in
+        Lwt.ignore_result @@ Dream.close_websocket websocket;
         Lwt.return_false
   in
   [ updater; socket_handler ] |> Task.multitask_websocket
