@@ -1,4 +1,31 @@
-open Utils
+module Task = struct
+  type promise = bool Lwt.t
+  type generator = unit -> promise
+  type t = promise * generator
+
+  let make (gen : generator) = (gen (), gen)
+
+  let get_promise (task : t) =
+    let p, _ = task in
+    p
+
+  let get_generator (task : t) =
+    let _, g = task in
+    g
+
+  let refresh (task : t) =
+    let p = get_promise task in
+    if Lwt.is_sleeping p then task else get_generator task |> make
+
+  let multitask_websocket (ts : t list) =
+    let rec aux ts =
+      let ps = List.map get_promise ts in
+      match%lwt Lwt.choose ps with
+      | true -> aux (List.map refresh ts)
+      | false -> Lwt.return_unit
+    in
+    aux ts
+end
 
 let update_time = 0.5
 
