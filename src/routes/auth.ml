@@ -15,14 +15,14 @@ let signup =
     with
     | Ok (Some user) ->
         let token = Services.User.token_of_user request user in
-        { token } |> yojson_of_token_response |> Utils.json_response ~status:`OK
+        { token } |> yojson_of_token_response |> Json.json_response ~status:`OK
     | Ok None ->
-        Utils.make_error_response `Internal_Server_Error
+        Json.make_error_response `Internal_Server_Error
           "Could not create account"
     | Error _ ->
-        Utils.make_error_response `Bad_Request "Could not create account"
+        Json.make_error_response `Bad_Request "Could not create account"
   in
-  Utils.json_receiver signup_params_of_yojson signup_base
+  Json.json_receiver signup_params_of_yojson signup_base
 
 type login_params = { username : string; password : string } [@@deriving yojson]
 
@@ -35,9 +35,9 @@ let login =
     | Ok user ->
         let token = Services.User.token_of_user request user in
         let json = { token } |> yojson_of_token_response in
-        Utils.json_response ~status:`OK json
-    | Error () -> Utils.make_error_response `Unauthorized "Login failed"
+        Json.json_response ~status:`OK json
+    | Error () -> Json.make_error_response `Unauthorized "Login failed"
   in
-  Utils.json_receiver login_params_of_yojson login_base
+  Json.json_receiver login_params_of_yojson login_base
 
 let routes = [ Dream.post "/signup" signup; Dream.post "/login" login ]
