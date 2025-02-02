@@ -4,6 +4,8 @@ let string_of_players_list l = String.concat "," l
 let players_list_of_string s = String.split_on_char ',' s
 
 module Game = struct
+  (* TODO: This is a mess.
+     How do we best handle different variations on the game type? *)
   type t =
     { guid : string
     ; name : string
