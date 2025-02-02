@@ -36,4 +36,4 @@ let encode_base62 str =
   |> List.to_seq
   |> String.of_seq
 
-let generate_uid prefix = prefix ^ (Dream.random 8 |> encode_base62)
+let generate prefix = prefix ^ (Dream.random 8 |> encode_base62)

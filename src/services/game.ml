@@ -81,7 +81,7 @@ let create_inactive_game ~request ~name ~owner =
   else (
     (* TODO: Change owner to uuid here and throughout lib *)
     (* TODO: Check if game name is unique against the inactive games *)
-    let guid = Utils.generate_uid "game_" in
+    let guid = Uid.generate "game_" in
     let is_active = false in
     let created_at = Unix.time () |> int_of_float |> string_of_int in
     let players = string_of_players_list [ owner ] in

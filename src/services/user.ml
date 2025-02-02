@@ -4,7 +4,7 @@ let token_of_user request (user : Models.User.User.t) =
   Dream.to_base64url (Dream.encrypt request ~associated_data:"uuid" user.uuid)
 
 let create_user ~request ~username ~password ~email =
-  let uuid = Utils.generate_uid "user_" in
+  let uuid = Uid.generate "user_" in
   let hashed_password = Bcrypt.hash password |> Bcrypt.string_of_hash in
   match%lwt
     Dream.sql request (Models.User.create_user ~uuid ~username ~email ~hashed_password)
