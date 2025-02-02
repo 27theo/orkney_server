@@ -1,4 +1,7 @@
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
+module Game = Services.Game
+module Json = Services.Json
+module Middleware = Services.Middleware
 
 type guid_json = { guid : string } [@@deriving yojson]
 type game_list = { games : Services.Game.Game.t list } [@@deriving yojson]

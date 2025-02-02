@@ -1,3 +1,5 @@
+module Game = Services.Game
+
 module Task = struct
   type promise = bool Lwt.t
   type generator = unit -> promise
@@ -34,7 +36,7 @@ let watch_games request =
   @@ fun websocket ->
   let data = ref "" in
   let check_for_updates () =
-    match%lwt Services.Game.select_relevant_games ~request with
+    match%lwt Game.select_relevant_games ~request with
     | Ok glist ->
       let serialized =
         Games.yojson_of_game_list { games = glist } |> Yojson.Safe.to_string
