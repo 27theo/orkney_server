@@ -64,7 +64,7 @@ let create_inactive_game ~request ~name ~owner =
     let is_active = false in
     let created_at = Unix.time () |> int_of_float |> string_of_int in
     let players = string_of_players_list [ owner ] in
-    let state = "" in
+    let state = State.empty in
     match%lwt
       Dream.sql
         request

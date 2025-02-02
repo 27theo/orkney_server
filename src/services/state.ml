@@ -9,6 +9,8 @@ type player_state =
 
 type t = { player_states : player_state list } [@@deriving yojson]
 
+let empty = ""
+
 let parsed_state_of_state state =
   if String.equal "" state
   then { player_states = [] }
