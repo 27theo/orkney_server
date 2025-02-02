@@ -5,10 +5,10 @@ type message_response = { message : string } [@@deriving yojson]
 
 let json_response ?status x = x |> Yojson.Safe.to_string |> Dream.json ?status
 
-let make_message_response status message =
+let message_response status message =
   { message } |> yojson_of_message_response |> json_response ~status
 
-let make_error_response status message =
+let error_response status message =
   { error = message } |> yojson_of_error_response |> json_response ~status
 
 let json_receiver json_parser handler request =
@@ -18,5 +18,4 @@ let json_receiver json_parser handler request =
     | _ -> Error ()
   with
   | Ok doc -> handler request doc
-  | Error _ ->
-    make_error_response `Bad_Request "That JSON input is not valid for this request"
+  | Error _ -> error_response `Bad_Request "That JSON input is not valid for this request"

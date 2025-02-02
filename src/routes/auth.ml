@@ -29,9 +29,8 @@ let signup =
     | Ok (Some user) ->
       let token = Services.User.token_of_user request user in
       { token } |> yojson_of_token_doc |> Json.json_response ~status:`OK
-    | Ok None ->
-      Json.make_error_response `Internal_Server_Error "Could not create account"
-    | Error _ -> Json.make_error_response `Bad_Request "Could not create account"
+    | Ok None -> Json.error_response `Internal_Server_Error "Could not create account"
+    | Error _ -> Json.error_response `Bad_Request "Could not create account"
   in
   Json.json_receiver signup_doc_of_yojson signup_base
 
@@ -47,7 +46,7 @@ let login =
       let token = Services.User.token_of_user request user in
       let json = { token } |> yojson_of_token_doc in
       Json.json_response ~status:`OK json
-    | Error () -> Json.make_error_response `Unauthorized "Login failed"
+    | Error () -> Json.error_response `Unauthorized "Login failed"
   in
   Json.json_receiver login_doc_of_yojson login_base
 
