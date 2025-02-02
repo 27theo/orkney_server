@@ -105,7 +105,6 @@ let activate_game ~request ~uuid ~guid =
       let%lwt users = get_users_from_game request g in
       let player_states = new_initial_state users in
       let state = { player_states } |> yojson_of_t |> Yojson.Safe.to_string in
-      let _ = Dream.log "State: %s" state in
       match%lwt Dream.sql request (Models.Game.activate_game ~guid ~state) with
       | Ok () -> Lwt.return_ok ()
       | Error _ ->

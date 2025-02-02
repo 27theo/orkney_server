@@ -8,7 +8,7 @@ let relevant_games request =
   | Ok glist ->
     yojson_of_game_list { games = glist } |> Yojson.Safe.to_string |> Dream.json
   | Error e ->
-    let () = Dream.log "Error fetching games from db: %s" (Caqti_error.show e) in
+    Dream.log "Error fetching games from db: %s" (Caqti_error.show e);
     Json.error_response `Internal_Server_Error "Could not fetch games from the database"
 
 let single_game request =
@@ -20,7 +20,7 @@ let single_game request =
   | Ok None ->
     Json.error_response `Not_Found (Printf.sprintf "No such game %s found" guid)
   | Error e ->
-    let () = Dream.log "Error fetching games from db: %s" (Caqti_error.show e) in
+    Dream.log "Error fetching games from db: %s" (Caqti_error.show e);
     Json.error_response
       `Internal_Server_Error
       (Printf.sprintf "Could not fetch game %s from the database" guid)
@@ -28,15 +28,12 @@ let single_game request =
 type create_game_params = { name : string } [@@deriving yojson]
 
 let create_game =
-  let create_game_base request (params : create_game_params) =
-    let uuid = Dream.field request Middleware.auth_field |> Option.get in
-    match%lwt
-      Services.Game.create_inactive_game ~request ~name:params.name ~owner:uuid
-    with
-    | Ok () -> Json.message_response `OK (Printf.sprintf "Game created: %s" params.name)
-    | Error code -> Json.error_response code "Could not create game"
-  in
-  Json.json_receiver create_game_params_of_yojson create_game_base
+  Json.json_receiver create_game_params_of_yojson
+  @@ fun request (params : create_game_params) ->
+  let uuid = Dream.field request Middleware.auth_field |> Option.get in
+  match%lwt Services.Game.create_inactive_game ~request ~name:params.name ~owner:uuid with
+  | Ok () -> Json.message_response `OK (Printf.sprintf "Game created: %s" params.name)
+  | Error code -> Json.error_response code "Could not create game"
 
 let activate_game request =
   let guid = Dream.param request "guid" in
