@@ -1,16 +1,16 @@
 (*
-https://github.com/paurkedal/ocaml-caqti/blob/master/examples/bikereg.ml
+   https://github.com/paurkedal/ocaml-caqti/blob/master/examples/bikereg.ml
 *)
 
 module type CONN = Caqti_lwt.CONNECTION
 
 module User = struct
-  type t = {
-    uuid : string;
-    username : string;
-    email : string;
-    hashed_password : string;
-  }
+  type t =
+    { uuid : string
+    ; username : string
+    ; email : string
+    ; hashed_password : string
+    }
 end
 
 module Q = struct
@@ -30,19 +30,25 @@ module Q = struct
     @@ proj_end
 
   let create_user =
-    t4 string string string string ->. unit @@
-    "INSERT INTO users (uuid, username, email, hashed_password) VALUES (?, ?, ?, ?)"
-  [@@ocamlformat "disable"]
+    (t4 string string string string ->. unit)
+    @@ {|
+      INSERT INTO users
+        (uuid, username, email, hashed_password)
+      VALUES
+        (?, ?, ?, ?)
+    |}
 
   let select_user_by_username =
-    string ->? user @@
-    "SELECT * FROM users WHERE username = ?"
-  [@@ocamlformat "disable"]
+    (string ->? user)
+    @@ {|
+      SELECT * FROM users WHERE username = ?"
+    |}
 
   let select_user_by_uuid =
-    string ->? user @@
-    "SELECT * FROM users WHERE uuid = ?"
-  [@@ocamlformat "disable"]
+    (string ->? user)
+    @@ {|
+      SELECT * FROM users WHERE uuid = ?
+    |}
 end
 
 let create_user ~uuid ~username ~email ~hashed_password (module Conn : CONN) =

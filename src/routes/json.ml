@@ -14,9 +14,9 @@ let make_error_response status message =
 let json_receiver json_parser handler request =
   let%lwt body = Dream.body request in
   match
-    try Ok (body |> Yojson.Safe.from_string |> json_parser) with _ -> Error ()
+    try Ok (body |> Yojson.Safe.from_string |> json_parser) with
+    | _ -> Error ()
   with
   | Ok doc -> handler request doc
   | Error _ ->
-      make_error_response `Bad_Request
-        "That JSON input is not valid for this request"
+    make_error_response `Bad_Request "That JSON input is not valid for this request"

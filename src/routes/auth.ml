@@ -2,42 +2,53 @@
 
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
-type signup_params = { username : string; password : string; email : string }
+type token_doc = { token : string } [@@deriving yojson]
+
+type signup_doc =
+  { username : string
+  ; password : string
+  ; email : string
+  }
 [@@deriving yojson]
 
-type token_response = { token : string } [@@deriving yojson]
+type login_doc =
+  { username : string
+  ; password : string
+  }
+[@@deriving yojson]
 
 let signup =
-  let signup_base request (params : signup_params) =
+  let signup_base request (params : signup_doc) =
     match%lwt
-      Services.User.create_user ~request ~username:params.username
-        ~password:params.password ~email:params.email
+      Services.User.create_user
+        ~request
+        ~username:params.username
+        ~password:params.password
+        ~email:params.email
     with
     | Ok (Some user) ->
-        let token = Services.User.token_of_user request user in
-        { token } |> yojson_of_token_response |> Json.json_response ~status:`OK
+      let token = Services.User.token_of_user request user in
+      { token } |> yojson_of_token_doc |> Json.json_response ~status:`OK
     | Ok None ->
-        Json.make_error_response `Internal_Server_Error
-          "Could not create account"
-    | Error _ ->
-        Json.make_error_response `Bad_Request "Could not create account"
+      Json.make_error_response `Internal_Server_Error "Could not create account"
+    | Error _ -> Json.make_error_response `Bad_Request "Could not create account"
   in
-  Json.json_receiver signup_params_of_yojson signup_base
-
-type login_params = { username : string; password : string } [@@deriving yojson]
+  Json.json_receiver signup_doc_of_yojson signup_base
 
 let login =
-  let login_base request (params : login_params) =
+  let login_base request (params : login_doc) =
     match%lwt
-      Services.User.authenticate_user ~request ~username:params.username
+      Services.User.authenticate_user
+        ~request
+        ~username:params.username
         ~password:params.password
     with
     | Ok user ->
-        let token = Services.User.token_of_user request user in
-        let json = { token } |> yojson_of_token_response in
-        Json.json_response ~status:`OK json
+      let token = Services.User.token_of_user request user in
+      let json = { token } |> yojson_of_token_doc in
+      Json.json_response ~status:`OK json
     | Error () -> Json.make_error_response `Unauthorized "Login failed"
   in
-  Json.json_receiver login_params_of_yojson login_base
+  Json.json_receiver login_doc_of_yojson login_base
 
 let routes = [ Dream.post "/signup" signup; Dream.post "/login" login ]
