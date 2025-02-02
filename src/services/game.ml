@@ -1,26 +1,5 @@
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
-module State = struct
-  type player_state =
-    { uuid : string
-    ; username : string
-    ; gold : int
-    }
-  [@@deriving yojson]
-
-  type t = { player_states : player_state list } [@@deriving yojson]
-
-  let parsed_state_of_state state =
-    if String.equal "" state
-    then { player_states = [] }
-    else state |> Yojson.Safe.from_string |> t_of_yojson
-
-  let initial_player_state (player : Models.User.User.t) =
-    { uuid = player.uuid; username = player.username; gold = 0 }
-
-  let new_initial_state plist = List.map initial_player_state plist
-end
-
 let string_of_players_list l = String.concat "," l
 let players_list_of_string s = String.split_on_char ',' s
 
