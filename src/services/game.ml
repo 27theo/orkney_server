@@ -26,7 +26,7 @@ let get_users_from_game request (game : Models.Game.Game.t) =
       @@ fun user ->
       match user with
       | Ok (Some u) -> u
-      | _ -> raise (Invalid_argument "Could not find such a user")
+      | _ -> failwith "This should never happen - could not find a user from uuid in game"
 
 let parsed_game_of_game ?(usernames = true) request (game : Models.Game.Game.t) =
   let open Game in
@@ -37,7 +37,7 @@ let parsed_game_of_game ?(usernames = true) request (game : Models.Game.Game.t) 
     @@
     match user with
     | Ok (Some u) -> u.username
-    | _ -> "NOTFOUND"
+    | _ -> failwith "This should never happen - no user found"
   in
   let%lwt players =
     if usernames then Lwt.all @@ List.map get_username plist else Lwt.return plist
