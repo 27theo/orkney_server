@@ -78,7 +78,9 @@ let create_inactive_game ~request ~name ~owner =
            ~state)
     with
     | Ok () -> Lwt.return_ok ()
-    | Error _ -> Lwt.return_error `Internal_Server_Error)
+    | Error _ ->
+      Dream.log "Could not create game - database create failed";
+      Lwt.return_error `Internal_Server_Error)
 
 let select_relevant_games ~request =
   match%lwt Dream.sql request Models.Game.select_relevant_games with
@@ -96,7 +98,7 @@ let activate_game ~request ~uuid ~guid =
   match%lwt select_game_by_guid ~request ~guid with
   | Ok (Some g) ->
     if String.equal g.owner uuid && Bool.not g.is_active
-    then
+    then (
       let open State in
       let%lwt users = get_users_from_game request g in
       let player_states = new_initial_state users in
@@ -104,10 +106,14 @@ let activate_game ~request ~uuid ~guid =
       let _ = Dream.log "State: %s" state in
       match%lwt Dream.sql request (Models.Game.activate_game ~guid ~state) with
       | Ok () -> Lwt.return_ok ()
-      | Error _ -> Lwt.return_error `Internal_Server_Error
+      | Error _ ->
+        Dream.log "Could not activate game - database activate failed";
+        Lwt.return_error `Internal_Server_Error)
     else Lwt.return_error `Bad_Request
   | Ok None -> Lwt.return_error `Bad_Request
-  | Error _ -> Lwt.return_error `Internal_Server_Error
+  | Error _ ->
+    Dream.log "Could not activate game - database select failed";
+    Lwt.return_error `Internal_Server_Error
 
 let add_user_to_game ~request ~uuid ~guid =
   match%lwt select_game_by_guid ~request ~guid with
@@ -120,9 +126,13 @@ let add_user_to_game ~request ~uuid ~guid =
       let players = string_of_players_list plist in
       match%lwt Dream.sql request (Models.Game.set_game_players ~guid ~players) with
       | Ok () -> Lwt.return_ok ()
-      | Error _ -> Lwt.return_error `Internal_Server_Error)
+      | Error _ ->
+        Dream.log "Could not add user to game - database set players failed";
+        Lwt.return_error `Internal_Server_Error)
   | Ok None -> Lwt.return_error `Bad_Request
-  | Error _ -> Lwt.return_error `Internal_Server_Error
+  | Error _ ->
+    Dream.log "Could not add user to game - database select failed";
+    Lwt.return_error `Internal_Server_Error
 
 let remove_user_from_game ~request ~uuid ~guid =
   match%lwt select_game_by_guid ~request ~guid with
@@ -138,9 +148,13 @@ let remove_user_from_game ~request ~uuid ~guid =
       let players = string_of_players_list plist in
       match%lwt Dream.sql request (Models.Game.set_game_players ~guid ~players) with
       | Ok () -> Lwt.return_ok ()
-      | Error _ -> Lwt.return_error `Internal_Server_Error)
+      | Error _ ->
+        Dream.log "Could not remove user from game - database set players failed";
+        Lwt.return_error `Internal_Server_Error)
   | Ok None -> Lwt.return_error `Bad_Request
-  | Error _ -> Lwt.return_error `Internal_Server_Error
+  | Error _ ->
+    Dream.log "Could not remove user from game - database select failed";
+    Lwt.return_error `Internal_Server_Error
 
 let delete_game ~request ~uuid ~guid =
   match%lwt select_game_by_guid ~request ~guid with
@@ -150,6 +164,10 @@ let delete_game ~request ~uuid ~guid =
     else (
       match%lwt Dream.sql request (Models.Game.delete_game ~guid) with
       | Ok () -> Lwt.return_ok ()
-      | Error _ -> Lwt.return_error `Internal_Server_Error)
+      | Error _ ->
+        Dream.log "Could not delete a game - database delete failed";
+        Lwt.return_error `Internal_Server_Error)
   | Ok None -> Lwt.return_error `Bad_Request
-  | Error _ -> Lwt.return_error `Internal_Server_Error
+  | Error _ ->
+    Dream.log "Could not delete a game - database select failed";
+    Lwt.return_error `Internal_Server_Error

@@ -10,7 +10,9 @@ let create_user ~request ~username ~password ~email =
     Dream.sql request (Models.User.create_user ~uuid ~username ~email ~hashed_password)
   with
   | Ok () -> Dream.sql request (Models.User.select_user_by_uuid ~uuid)
-  | Error _ -> Lwt.return_error `Internal_Server_Error
+  | Error _ ->
+    Dream.log "Could not create user - database create failed";
+    Lwt.return_error `Internal_Server_Error
 
 let select_user_by_username ~request ~username =
   Dream.sql request @@ Models.User.select_user_by_username ~username
